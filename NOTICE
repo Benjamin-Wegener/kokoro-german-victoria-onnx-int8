@@ -1,0 +1,8 @@
+Kokoro German Victoria (ONNX, int8)
+Derived work. Original model weights and voicepack:
+  kikiri-tts/kikiri-german-victoria  (Apache-2.0) https://huggingface.co/kikiri-tts/kikiri-german-victoria
+Built on:
+  kikiri-tts/kikiri-german-base-51speakers-synthetic (Apache-2.0)
+  hexgrad/Kokoro-82M (Apache-2.0), StyleTTS2 (MIT)
+Changes: exported to ONNX (opset 17, CustomSTFT), dynamic int8 weight quantization,
+voicepack converted to a raw float32 [510,256] file, token table written from the Kokoro vocabulary.
