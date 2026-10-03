@@ -28,4 +28,20 @@ torch.onnx.export(Wrapper(km).eval(), (tokens, style, torch.tensor([1.0])), "mod
                   input_names=["tokens", "style", "speed"], output_names=["audio"],
                   dynamic_axes={"tokens": {1: "n"}, "audio": {0: "len"}}, opset_version=17, dynamo=False)
 voice.numpy().reshape(510, 256).astype("float32").tofile("voices.bin")
-# int8: onnxruntime.quantization.quantize_dynamic("model.onnx", "model.int8.onnx", weight_type=QuantType.QUInt8)
+
+# int8: dynamic weight quantization
+from onnxruntime.quantization import quantize_dynamic, QuantType
+quantize_dynamic("model.onnx", "model.int8.onnx", weight_type=QuantType.QUInt8)
+
+# sherpa-onnx reads these metadata keys for Kokoro models
+# (version 2 + lang="de" = multi-lingual path, phonemes via espeak-ng)
+import onnx
+m = onnx.load("model.int8.onnx")
+meta = {"model_type": "kokoro", "language": "German", "has_espeak": 1, "sample_rate": 24000, "version": 2,
+        "voice": "de", "style_dim": "510,1,256", "n_speakers": 1, "speaker2id": "victoria->0",
+        "id2speaker": "0->victoria", "speaker_names": "victoria"}
+while len(m.metadata_props):
+    m.metadata_props.pop()
+for k, v in meta.items():
+    p = m.metadata_props.add(); p.key = k; p.value = str(v)
+onnx.save(m, "model.int8.onnx")

@@ -1,6 +1,6 @@
 # Kokoro German Victoria (ONNX, int8)
 
-**Download:** `model.int8.onnx` and `voices.bin` are attached to the [latest release](../../releases/latest) and also hosted at [Hugging Face](https://huggingface.co/Benjamin-Wegener/kokoro-german-victoria-onnx-int8) (SHA-256 of `model.int8.onnx`: `2ca2ecb287abaa2d27116c2fd2351bf5679aa62354d987f05794a4bf759149bd`).
+**Download:** `model.int8.onnx` and `voices.bin` are attached to the [latest release](../../releases/latest) and also hosted at [Hugging Face](https://huggingface.co/Benjamin-Wegener/kokoro-german-victoria-onnx-int8) (SHA-256 of `model.int8.onnx`: `19fb607aaa7ee9ce4bc3b708c9c4c3defa24786211e3d58bc4d2ad922b3890dd`).
 
 ONNX export of [kikiri-tts/kikiri-german-victoria](https://huggingface.co/kikiri-tts/kikiri-german-victoria),
 a German single-speaker, Kokoro-compatible (StyleTTS2) text-to-speech model, for on-device inference with
@@ -18,12 +18,14 @@ Model I/O: `tokens` int64 `[1, N]`, `style` float32 `[1, 256]`, `speed` float32 
 ## Usage (sherpa-onnx)
 
 Kokoro config: `model=model.int8.onnx`, `voices=voices.bin`, `tokens=tokens.txt`,
-`dataDir=<espeak-ng-data>`, `lang=de`.
+`dataDir=<espeak-ng-data>`, `lang=de`. The ONNX file already carries the metadata sherpa-onnx needs
+(`model_type=kokoro`, `version=2`, `sample_rate=24000`, ...); tested with sherpa-onnx 1.13.8 (desktop and Android).
 
 ## Notes and limitations
 
 - Synthetic voice: label the output as AI-generated where required (e.g. EU AI Act Art. 50).
-- The int8 model was checked with onnxruntime on German phoneme input (it produces audio of the same length and level as fp32); a formal listening test was not done.
+- Runs at roughly real-time speed on a Pixel-class phone CPU (about 1 s of compute per 1 s of audio, 4 threads).
+- A formal listening test comparing int8 with fp32 was not done.
 - The phoneme `ʏ` (short ü) is not in the Kokoro vocabulary. Map it to `y` before tokenizing.
 - Weights are slightly different from the fp32 export because of quantization.
 
